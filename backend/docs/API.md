@@ -173,7 +173,14 @@ Valores possíveis: `RECEBIDO`, `EM_PREPARO`, `SAIU_PARA_ENTREGA`, `ENTREGUE`, `
 
 **Respostas**
 - `200 OK` — `OrderResponse` com o status atualizado.
-- `400 Bad Request` — valor de status ausente/inválido.
+- `400 Bad Request` — `status` ausente:
+  ```json
+  { "timestamp": "...", "status": 400, "errors": { "status": "must not be null" } }
+  ```
+- `400 Bad Request` — `status` com valor que não existe no enum:
+  ```json
+  { "timestamp": "...", "status": 400, "message": "Valor inválido para 'status': XYZ. Valores aceitos: [RECEBIDO, EM_PREPARO, SAIU_PARA_ENTREGA, ENTREGUE, CANCELADO]" }
+  ```
 - `404 Not Found` — pedido não existe ou não pertence ao usuário autenticado.
 
 ---
@@ -193,3 +200,6 @@ Remove um pedido (e seus itens, via cascade).
 - Todos os IDs (`User`, `Order`, `OrderItem`) são `UUID`.
 - Sem sessão no servidor: cada requisição precisa do token, não há cookie/estado guardado no banco.
 - Pedidos são isolados por usuário: não existe um "painel compartilhado" — cada conta só enxerga seus próprios pedidos.
+- Formato de erro: respostas de erro sempre trazem `timestamp` e `status`, mais um dos dois campos abaixo:
+  - `errors` (mapa campo → mensagem) — quando falha a validação do Bean Validation (`@NotBlank`, `@Email`, `@Min`, etc.).
+  - `message` (string única) — para erros de negócio (`409` e-mail em uso, `401` credenciais inválidas, `404` recurso não encontrado) e para corpo de requisição malformado/com tipo inválido (ex: `status` fora do enum).

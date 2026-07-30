@@ -1,0 +1,8 @@
+target/
+app.db
+*.db
+*.db-journal
+.idea/
+*.iml
+.vscode/
+docs/
