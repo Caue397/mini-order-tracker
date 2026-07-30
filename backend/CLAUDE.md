@@ -33,7 +33,7 @@ Regra: ao criar uma nova classe, primeiro identifique a camada (controller/servi
 ## Domínio
 
 - **User**: id, name, email (único), password (hash).
-- **Order**: id, customerName, deliveryAddress (`@Embeddable`), status (`OrderStatus` enum), items (`List<OrderItem>`, cascade all).
+- **Order**: id, customerName, deliveryAddress (`@Embeddable`), status (`OrderStatus` enum), items (`List<OrderItem>`, cascade all), owner (`@ManyToOne User`, `@JsonIgnore`) — pedidos são escopados por dono, cada usuário só vê/edita/deleta os próprios.
 - **OrderStatus**: `RECEBIDO`, `EM_PREPARO`, `SAIU_PARA_ENTREGA`, `ENTREGUE`, `CANCELADO`.
 - **OrderItem**: id, productName, quantity, referência ao Order (`@ManyToOne`, `@JsonIgnore` pra evitar loop de serialização).
 
@@ -44,6 +44,28 @@ Regra: ao criar uma nova classe, primeiro identifique a camada (controller/servi
 - Nunca retornar entidades JPA diretamente nos controllers — sempre passar por um DTO de response.
 - Senhas sempre com `BCryptPasswordEncoder`, nunca em texto plano.
 - Autenticação via JWT stateless (token no header `Authorization: Bearer <token>`).
+- `jwt.secret` e `jwt.expiration-ms` são obrigatórios via variável de ambiente (`JWT_SECRET`, `JWT_EXPIRATION_MS`), sem valor padrão em `application.yaml` — a aplicação não sobe sem eles configurados (na run configuration do IntelliJ ou no ambiente). Testes usam valores fixos em `src/test/resources/application.yaml`, não dependem de env var.
+
+## Autenticação
+
+Fluxo JWT stateless (sem sessão no banco), implementado em:
+- `service/UserDetailsServiceImpl.java`, `service/AuthService.java`, `service/CurrentUserProvider.java`
+- `config/JwtAuthFilter.java` (filtro que valida o token e popula o `SecurityContextHolder`), `config/SecurityConfig.java` (filter chain stateless)
+- `controller/AuthController.java` (`POST /api/auth/register`, `POST /api/auth/login` — únicas rotas públicas)
+- `controller/UserController.java` (`GET /api/users/me` — exemplo de rota protegida)
+
+`CurrentUserProvider.getCurrentUser()` é o ponto único para descobrir o usuário autenticado da requisição atual (lê o email do `SecurityContextHolder` e busca o `User` no banco) — qualquer service/controller futuro que precisar limitar dados ao dono da conta deve usar esse provider, não acessar o `SecurityContextHolder` diretamente.
+
+## Pedidos
+
+CRUD completo em `service/OrderService.java` + `controller/OrderController.java`, escopado por usuário via `CurrentUserProvider` e `OrderRepository.findAllByOwnerId`/`findByIdAndOwnerId`:
+- `POST /api/orders` — cria pedido (cliente, itens, endereço), status inicial `RECEBIDO`.
+- `GET /api/orders` — lista os pedidos do usuário autenticado.
+- `GET /api/orders/{id}` — busca por id (404 se não existir ou não for do usuário).
+- `PATCH /api/orders/{id}/status` — atualiza status livremente entre os 5 valores (sem máquina de estados).
+- `DELETE /api/orders/{id}` — remove o pedido.
+
+Acesso a pedido de outro usuário retorna 404 (não 403), para não revelar a existência do recurso.
 
 ## Comandos
 
