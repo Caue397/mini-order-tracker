@@ -64,6 +64,28 @@ public class OrderService {
         return toResponse(getOwnedOrder(id));
     }
 
+    public OrderResponse update(UUID id, CreateOrderRequest request) {
+        Order order = getOwnedOrder(id);
+        order.setCustomerName(request.customerName());
+        order.setDeliveryAddress(new DeliveryAddress(
+                request.deliveryAddress().street(),
+                request.deliveryAddress().number(),
+                request.deliveryAddress().city(),
+                request.deliveryAddress().state(),
+                request.deliveryAddress().zipCode()));
+
+        order.getItems().clear();
+        for (OrderItemRequest itemRequest : request.items()) {
+            OrderItem item = new OrderItem();
+            item.setProductName(itemRequest.productName());
+            item.setQuantity(itemRequest.quantity());
+            order.addItem(item);
+        }
+
+        orderRepository.save(order);
+        return toResponse(order);
+    }
+
     public OrderResponse updateStatus(UUID id, UpdateOrderStatusRequest request) {
         Order order = getOwnedOrder(id);
         order.setStatus(request.status());

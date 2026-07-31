@@ -109,6 +109,39 @@ class OrderServiceTest {
     }
 
     @Test
+    void update_replacesCustomerNameAddressAndItems() {
+        when(currentUserProvider.getCurrentUser()).thenReturn(owner);
+        Order order = buildOrder(owner);
+        when(orderRepository.findByIdAndOwnerId(order.getId(), owner.getId())).thenReturn(Optional.of(order));
+
+        CreateOrderRequest updateRequest = new CreateOrderRequest(
+                "Maria Souza",
+                List.of(new OrderItemRequest("Hamburguer", 3)),
+                new DeliveryAddressRequest("Av Paulista", "1000", "São Paulo", "SP", "01310-100"));
+
+        OrderResponse response = orderService.update(order.getId(), updateRequest);
+
+        assertThat(response.customerName()).isEqualTo("Maria Souza");
+        assertThat(response.deliveryAddress().street()).isEqualTo("Av Paulista");
+        assertThat(response.items()).hasSize(1);
+        assertThat(response.items().get(0).productName()).isEqualTo("Hamburguer");
+        assertThat(response.status()).isEqualTo(OrderStatus.RECEBIDO);
+        verify(orderRepository).save(order);
+    }
+
+    @Test
+    void update_whenOrderNotOwned_throwsOrderNotFoundException() {
+        when(currentUserProvider.getCurrentUser()).thenReturn(owner);
+        UUID otherOrderId = UUID.randomUUID();
+        when(orderRepository.findByIdAndOwnerId(otherOrderId, owner.getId())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> orderService.update(otherOrderId, createOrderRequest()))
+                .isInstanceOf(OrderNotFoundException.class);
+
+        verify(orderRepository, org.mockito.Mockito.never()).save(any());
+    }
+
+    @Test
     void updateStatus_updatesAndPersistsNewStatus() {
         when(currentUserProvider.getCurrentUser()).thenReturn(owner);
         Order order = buildOrder(owner);

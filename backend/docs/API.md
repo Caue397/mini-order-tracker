@@ -160,6 +160,36 @@ Busca um pedido específico por id.
 
 ---
 
+### `PUT /api/orders/{id}`
+
+Atualiza os dados completos de um pedido (cliente, itens e endereço de entrega). O `status` não é alterado por esse endpoint — para isso use o `PATCH /api/orders/{id}/status`.
+
+**Body** — mesmo formato do `POST /api/orders`:
+```json
+{
+  "customerName": "João da Silva",
+  "items": [
+    { "productName": "Pizza Margherita", "quantity": 2 }
+  ],
+  "deliveryAddress": {
+    "street": "Rua das Flores",
+    "number": "123",
+    "city": "São Paulo",
+    "state": "SP",
+    "zipCode": "01234-567"
+  }
+}
+```
+
+Validações: idênticas ao `POST /api/orders`. A lista de itens enviada **substitui inteiramente** a lista anterior (itens antigos não incluídos no body são removidos).
+
+**Respostas**
+- `200 OK` — `OrderResponse` com os dados atualizados.
+- `400 Bad Request` — falha de validação (mesmo formato do create).
+- `404 Not Found` — pedido não existe ou não pertence ao usuário autenticado.
+
+---
+
 ### `PATCH /api/orders/{id}/status`
 
 Atualiza o status de um pedido. Aceita qualquer um dos 5 valores, sem restrição de transição/sequência.
