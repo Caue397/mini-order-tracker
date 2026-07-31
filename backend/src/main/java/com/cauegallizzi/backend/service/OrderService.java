@@ -37,6 +37,7 @@ public class OrderService {
         order.setDeliveryAddress(new DeliveryAddress(
                 request.deliveryAddress().street(),
                 request.deliveryAddress().number(),
+                request.deliveryAddress().neighborhood(),
                 request.deliveryAddress().city(),
                 request.deliveryAddress().state(),
                 request.deliveryAddress().zipCode()));
@@ -70,6 +71,7 @@ public class OrderService {
         order.setDeliveryAddress(new DeliveryAddress(
                 request.deliveryAddress().street(),
                 request.deliveryAddress().number(),
+                request.deliveryAddress().neighborhood(),
                 request.deliveryAddress().city(),
                 request.deliveryAddress().state(),
                 request.deliveryAddress().zipCode()));
@@ -106,7 +108,8 @@ public class OrderService {
     private OrderResponse toResponse(Order order) {
         DeliveryAddress address = order.getDeliveryAddress();
         DeliveryAddressResponse addressResponse = new DeliveryAddressResponse(
-                address.getStreet(), address.getNumber(), address.getCity(), address.getState(), address.getZipCode());
+                address.getStreet(), address.getNumber(), address.getNeighborhood(), address.getCity(),
+                address.getState(), address.getZipCode());
 
         List<OrderItemResponse> itemResponses = order.getItems().stream()
                 .map(item -> new OrderItemResponse(item.getId(), item.getProductName(), item.getQuantity()))

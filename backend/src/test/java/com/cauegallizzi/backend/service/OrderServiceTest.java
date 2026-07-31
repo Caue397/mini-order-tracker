@@ -57,7 +57,7 @@ class OrderServiceTest {
         return new CreateOrderRequest(
                 "João da Silva",
                 List.of(new OrderItemRequest("Pizza", 1), new OrderItemRequest("Refrigerante", 2)),
-                new DeliveryAddressRequest("Rua das Flores", "123", "São Paulo", "SP", "01234-567"));
+                new DeliveryAddressRequest("Rua das Flores", "123", "Centro", "São Paulo", "SP", "01234-567"));
     }
 
     @Test
@@ -117,7 +117,7 @@ class OrderServiceTest {
         CreateOrderRequest updateRequest = new CreateOrderRequest(
                 "Maria Souza",
                 List.of(new OrderItemRequest("Hamburguer", 3)),
-                new DeliveryAddressRequest("Av Paulista", "1000", "São Paulo", "SP", "01310-100"));
+                new DeliveryAddressRequest("Av Paulista", "1000", "Bela Vista", "São Paulo", "SP", "01310-100"));
 
         OrderResponse response = orderService.update(order.getId(), updateRequest);
 
@@ -190,7 +190,7 @@ class OrderServiceTest {
         Order order = new Order();
         order.setId(UUID.randomUUID());
         order.setCustomerName("João da Silva");
-        order.setDeliveryAddress(new DeliveryAddress("Rua das Flores", "123", "São Paulo", "SP", "01234-567"));
+        order.setDeliveryAddress(new DeliveryAddress("Rua das Flores", "123", "Centro", "São Paulo", "SP", "01234-567"));
         order.setOwner(owner);
 
         OrderItem item = new OrderItem();

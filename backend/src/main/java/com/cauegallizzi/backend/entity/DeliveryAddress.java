@@ -21,6 +21,9 @@ public class DeliveryAddress {
     private String number;
 
     @Column(nullable = false)
+    private String neighborhood;
+
+    @Column(nullable = false)
     private String city;
 
     @Column(nullable = false)

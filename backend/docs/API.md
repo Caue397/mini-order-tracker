@@ -113,6 +113,7 @@ Cria um novo pedido, associado ao usuário autenticado. Status inicial sempre `R
   "deliveryAddress": {
     "street": "Rua das Flores",
     "number": "123",
+    "neighborhood": "Centro",
     "city": "São Paulo",
     "state": "SP",
     "zipCode": "01234-567"
@@ -128,7 +129,7 @@ Validações: `customerName` obrigatório; `items` não pode ser vazio, cada ite
   {
     "id": "b3f1...uuid",
     "customerName": "João da Silva",
-    "deliveryAddress": { "street": "Rua das Flores", "number": "123", "city": "São Paulo", "state": "SP", "zipCode": "01234-567" },
+    "deliveryAddress": { "street": "Rua das Flores", "number": "123", "neighborhood": "Centro", "city": "São Paulo", "state": "SP", "zipCode": "01234-567" },
     "status": "RECEBIDO",
     "items": [
       { "id": "...uuid", "productName": "Pizza Margherita", "quantity": 1 },
@@ -174,6 +175,7 @@ Atualiza os dados completos de um pedido (cliente, itens e endereço de entrega)
   "deliveryAddress": {
     "street": "Rua das Flores",
     "number": "123",
+    "neighborhood": "Centro",
     "city": "São Paulo",
     "state": "SP",
     "zipCode": "01234-567"
