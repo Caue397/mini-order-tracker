@@ -13,9 +13,10 @@ export const orderSchema = z.object({
   deliveryAddress: z.object({
     street: z.string().min(1, "Informe a rua"),
     number: z.string().min(1, "Informe o número"),
+    neighborhood: z.string().min(1, "Informe o bairro"),
     city: z.string().min(1, "Informe a cidade"),
     state: z.string().min(1, "Informe o estado"),
-    zipCode: z.string().min(1, "Informe o CEP"),
+    zipCode: z.string().regex(/^\d{5}-\d{3}$/, "CEP inválido, use o formato 00000-000"),
   }),
 });
 

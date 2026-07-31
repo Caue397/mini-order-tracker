@@ -16,6 +16,7 @@ export const ORDER_STATUSES: OrderStatus[] = [
 export interface DeliveryAddress {
   street: string;
   number: string;
+  neighborhood: string;
   city: string;
   state: string;
   zipCode: string;

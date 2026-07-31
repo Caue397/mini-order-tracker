@@ -17,8 +17,13 @@ import type { Order } from "@/lib/types";
 const emptyValues: OrderFormValues = {
   customerName: "",
   items: [{ productName: "", quantity: 1 }],
-  deliveryAddress: { street: "", number: "", city: "", state: "", zipCode: "" },
+  deliveryAddress: { street: "", number: "", neighborhood: "", city: "", state: "", zipCode: "" },
 };
+
+function formatZipCode(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 8);
+  return digits.length > 5 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : digits;
+}
 
 function toFormValues(order: Order): OrderFormValues {
   return {
@@ -46,6 +51,9 @@ export function OrderForm({ order }: { order?: Order }) {
   });
 
   const { fields, append, remove } = useFieldArray({ control, name: "items" });
+
+  const numberField = register("deliveryAddress.number");
+  const zipCodeField = register("deliveryAddress.zipCode");
 
   async function onSubmit(values: OrderFormValues) {
     try {
@@ -127,14 +135,36 @@ export function OrderForm({ order }: { order?: Order }) {
         <h2 className="font-semibold text-foreground">Endereço de entrega</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Input
+            label="CEP"
+            inputMode="numeric"
+            placeholder="00000-000"
+            maxLength={9}
+            error={errors.deliveryAddress?.zipCode?.message}
+            {...zipCodeField}
+            onChange={(e) => {
+              e.target.value = formatZipCode(e.target.value);
+              zipCodeField.onChange(e);
+            }}
+          />
+          <Input
             label="Rua"
             error={errors.deliveryAddress?.street?.message}
             {...register("deliveryAddress.street")}
           />
           <Input
             label="Número"
+            inputMode="numeric"
             error={errors.deliveryAddress?.number?.message}
-            {...register("deliveryAddress.number")}
+            {...numberField}
+            onChange={(e) => {
+              e.target.value = e.target.value.replace(/\D/g, "");
+              numberField.onChange(e);
+            }}
+          />
+          <Input
+            label="Bairro"
+            error={errors.deliveryAddress?.neighborhood?.message}
+            {...register("deliveryAddress.neighborhood")}
           />
           <Input
             label="Cidade"
@@ -145,11 +175,6 @@ export function OrderForm({ order }: { order?: Order }) {
             label="Estado"
             error={errors.deliveryAddress?.state?.message}
             {...register("deliveryAddress.state")}
-          />
-          <Input
-            label="CEP"
-            error={errors.deliveryAddress?.zipCode?.message}
-            {...register("deliveryAddress.zipCode")}
           />
         </div>
       </Card>

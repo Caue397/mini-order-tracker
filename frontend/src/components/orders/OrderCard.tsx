@@ -17,7 +17,7 @@ import { getApiErrorMessage } from "@/lib/api";
 export function OrderCard({ order }: { order: Order }) {
   const updateStatus = useUpdateOrderStatus();
   const deleteOrder = useDeleteOrder();
-  const { street, number, city, state, zipCode } = order.deliveryAddress;
+  const { street, number, neighborhood, city, state, zipCode } = order.deliveryAddress;
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const StatusIcon = statusIcons[order.status];
 
@@ -41,7 +41,7 @@ export function OrderCard({ order }: { order: Order }) {
         <p className="flex mt-1.5 items-start gap-1 text-xs text-muted">
           <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
           <span>
-            {street}, {number} — {city}/{state} — {zipCode}
+            {street}, {number} — {neighborhood} — {city}/{state} — {zipCode}
           </span>
         </p>
       </div>
