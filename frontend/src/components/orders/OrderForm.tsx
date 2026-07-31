@@ -9,32 +9,53 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 import { useCreateOrder } from "@/hooks/useCreateOrder";
+import { useUpdateOrder } from "@/hooks/useUpdateOrder";
 import { getApiErrorMessage } from "@/lib/api";
 import { orderSchema, type OrderFormValues } from "@/schemas/order.schema";
+import type { Order } from "@/lib/types";
 
-const defaultValues: OrderFormValues = {
+const emptyValues: OrderFormValues = {
   customerName: "",
   items: [{ productName: "", quantity: 1 }],
   deliveryAddress: { street: "", number: "", city: "", state: "", zipCode: "" },
 };
 
-export function NewOrderForm() {
+function toFormValues(order: Order): OrderFormValues {
+  return {
+    customerName: order.customerName,
+    items: order.items.map((item) => ({ productName: item.productName, quantity: item.quantity })),
+    deliveryAddress: { ...order.deliveryAddress },
+  };
+}
+
+export function OrderForm({ order }: { order?: Order }) {
   const router = useRouter();
+  const isEditing = !!order;
+
   const createOrder = useCreateOrder();
+  const updateOrder = useUpdateOrder(order?.id ?? "");
 
   const {
     register,
     handleSubmit,
     control,
     formState: { errors, isSubmitting },
-  } = useForm<OrderFormValues>({ resolver: zodResolver(orderSchema), defaultValues });
+  } = useForm<OrderFormValues>({
+    resolver: zodResolver(orderSchema),
+    defaultValues: order ? toFormValues(order) : emptyValues,
+  });
 
   const { fields, append, remove } = useFieldArray({ control, name: "items" });
 
   async function onSubmit(values: OrderFormValues) {
     try {
-      await createOrder.mutateAsync(values);
-      toast.success("Pedido criado com sucesso");
+      if (isEditing) {
+        await updateOrder.mutateAsync(values);
+        toast.success("Pedido atualizado com sucesso");
+      } else {
+        await createOrder.mutateAsync(values);
+        toast.success("Pedido criado com sucesso");
+      }
       router.push("/orders");
     } catch (err) {
       toast.error(getApiErrorMessage(err));
@@ -138,7 +159,7 @@ export function NewOrderForm() {
           Cancelar
         </Button>
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Criando..." : "Criar pedido"}
+          {isSubmitting ? "Salvando..." : isEditing ? "Salvar alterações" : "Criar pedido"}
         </Button>
       </div>
     </form>

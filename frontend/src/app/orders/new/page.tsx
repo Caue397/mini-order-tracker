@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { Header } from "@/components/layout/Header";
-import { NewOrderForm } from "@/components/orders/NewOrderForm";
+import { OrderForm } from "@/components/orders/OrderForm";
 import { Spinner } from "@/components/ui/Spinner";
 
 export default function NewOrderPage() {
@@ -30,7 +30,7 @@ export default function NewOrderPage() {
       <Header />
       <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-10">
         <h1 className="mb-6 text-2xl font-bold text-foreground">Novo pedido</h1>
-        <NewOrderForm />
+        <OrderForm />
       </main>
     </>
   );

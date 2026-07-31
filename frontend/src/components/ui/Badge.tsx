@@ -1,4 +1,5 @@
 import type { OrderStatus } from "@/lib/types";
+import { statusLabels } from "@/lib/orderStatus";
 
 const statusClasses: Record<OrderStatus, string> = {
   RECEBIDO: "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300",
@@ -11,18 +12,10 @@ const statusClasses: Record<OrderStatus, string> = {
   CANCELADO: "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300",
 };
 
-const statusLabels: Record<OrderStatus, string> = {
-  RECEBIDO: "Recebido",
-  EM_PREPARO: "Em preparo",
-  SAIU_PARA_ENTREGA: "Saiu para entrega",
-  ENTREGUE: "Entregue",
-  CANCELADO: "Cancelado",
-};
-
-export function Badge({ status }: { status: OrderStatus }) {
+export function Badge({ status, className = "" }: { status: OrderStatus; className?: string }) {
   return (
     <span
-      className={`inline-flex items-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[status]}`}
+      className={`inline-flex items-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[status]} ${className}`}
     >
       {statusLabels[status]}
     </span>
